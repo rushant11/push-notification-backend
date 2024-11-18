@@ -19,15 +19,16 @@ app.get("/", (req, res) => {
 
 // Route to save token (already exists)
 app.post("/api/save-token", async (req, res) => {
-  const { token } = req.body;
+  //   const { token } = req.body;
 
-  if (!token) {
-    return res.status(400).json({ error: "Token is required" });
-  }
+  //   if (!token) {
+  //     return res.status(400).json({ error: "Token is required" });
+  //   }
 
-  const newToken = new Token({ token });
-  await newToken.save();
-  res.status(200).json({ message: "Token saved successfully" });
+  //   const newToken = new Token({ token });
+  //   await newToken.save();
+  //   res.status(200).json({ message: "Token saved successfully" });
+  res.send("Token saved successfully");
 });
 
 // Route to send notification to all users
