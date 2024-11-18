@@ -14,7 +14,7 @@ app.use(cors());
 connectDB();
 
 app.get("/", (req, res) => {
-  res.send("Welcome to the Push Notification Backend API!");
+  res.send("Welcome to the Push Notification Backend API with Heroku!");
 });
 
 // Route to save token (already exists)
