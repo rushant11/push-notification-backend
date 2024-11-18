@@ -13,6 +13,10 @@ app.use(cors());
 
 connectDB();
 
+app.get("/", (req, res) => {
+  res.send("Welcome to the Push Notification Backend API!");
+});
+
 // Route to save token (already exists)
 app.post("/api/save-token", async (req, res) => {
   const { token } = req.body;
