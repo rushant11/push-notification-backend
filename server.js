@@ -18,18 +18,18 @@ app.get("/", (req, res) => {
 });
 
 // Route to save token (already exists)
-app.post('/save-token', async (req, res) => {
+app.post("/save-token", async (req, res) => {
   const { token } = req.body;
-  if (!token) return res.status(400).send('Token is required');
+  if (!token) return res.status(400).send("Token is required");
 
   const existingToken = await Token.findOne({ token });
   if (existingToken) {
-      return res.status(200).send('Token already exists');
+    return res.status(200).send("Token already exists");
   }
 
   const newToken = new Token({ token });
   await newToken.save();
-  res.status(201).send('Token saved');
+  res.status(201).send("Token saved");
 });
 
 // Route to send notification to all users
@@ -61,9 +61,7 @@ app.post("/api/send-notification", async (req, res) => {
     res.status(200).json({ message: "Notifications sent", responses });
   } catch (error) {
     console.error("Error sending notifications:", error);
-    if (!res.headersSent) {
-      res.status(500).json({ error: "Failed to send notification" });
-    }
+    res.status(500).json({ error: "Failed to send notification" });
   }
 });
 
