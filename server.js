@@ -61,7 +61,7 @@ app.post("/api/send-notification", async (req, res) => {
     res.status(200).json({ message: "Notifications sent", responses });
   } catch (error) {
     console.error("Error sending notifications:", error);
-    res.status(500).json({ error: "Failed to send notification" });
+    // res.status(500).json({ error: "Failed to send notification" });
   }
 });
 
