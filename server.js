@@ -19,14 +19,14 @@ app.get("/", (req, res) => {
 
 // Route to save token (already exists)
 app.post("/api/save-token", async (req, res) => {
-    const { token } = req.body;
+  const { token } = req.body;
 
-    if (!token) {
-      return res.status(400).json({ error: "Token is required" });
-    }
-    const newToken = new Token({ token });
-    await newToken.save();
-    res.status(200).json({ message: "Token saved successfully" });
+  if (!token) {
+    return res.status(400).json({ error: "Token is required" });
+  }
+  const newToken = new Token({ token });
+  await newToken.save();
+  res.status(200).json({ message: "Token saved successfully" });
   res.send("Token saved successfully");
 });
 
@@ -41,19 +41,22 @@ app.post("/api/send-notification", async (req, res) => {
   // Fetch all tokens from the database
   const tokens = await Token.find();
 
-  // Send notifications to all tokens
-  const messages = tokens.map((tokenDoc) => ({
-    to: tokenDoc.token,
-    sound: "default",
-    title,
-    body,
-  }));
+  if (!tokens.length) {
+    return res.status(404).json({ error: "No tokens found" });
+  }
 
   try {
-    const response = await axios.post("https://exp.host/--/api/v2/push/send", {
-      messages,
-    });
-    res.status(200).json({ message: "Notifications sent", response });
+    const responses = await Promise.all(
+      tokens.map((tokenDoc) =>
+        axios.post("https://exp.host/--/api/v2/push/send", {
+          to: tokenDoc.token,
+          sound: "default",
+          title,
+          body,
+        })
+      )
+    );
+    res.status(200).json({ message: "Notifications sent", responses });
   } catch (error) {
     console.error("Error sending notifications:", error);
     res.status(500).json({ error: "Failed to send notifications" });
