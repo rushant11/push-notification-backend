@@ -52,14 +52,15 @@ app.post("/api/send-notification", async (req, res) => {
     }
 
     const responses = await Promise.all(
-      tokens.map((tokenDoc) =>
-        axios.post("https://exp.host/--/api/v2/push/send", {
+      tokens.map((tokenDoc) => {
+        console.log("🚀 ~ app.post ~ tokenDoc.name:", tokenDoc.name);
+        return axios.post("https://exp.host/--/api/v2/push/send", {
           to: tokenDoc.token,
           sound: "default",
           title: `Hiii ${tokenDoc.name}`,
           body,
-        })
-      )
+        });
+      })
     );
 
     res
