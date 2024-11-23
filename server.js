@@ -20,15 +20,16 @@ app.get("/", (req, res) => {
 // Route to save token (already exists)
 app.post("/save-token", async (req, res) => {
   try {
-    const { token } = req.body;
-    if (!token) return res.status(400).json({ error: "Token is required" });
+    const { token, name } = req.body;
+    if (!token || !name)
+      return res.status(400).json({ error: "Token and name are required" });
 
     const existingToken = await Token.findOne({ token });
     if (existingToken) {
       return res.status(200).json({ message: "Token already exists" });
     }
 
-    const newToken = new Token({ token });
+    const newToken = new Token({ token, name });
     await newToken.save();
     res.status(201).json({ message: "Token saved successfully" });
   } catch (error) {
@@ -55,7 +56,7 @@ app.post("/api/send-notification", async (req, res) => {
         axios.post("https://exp.host/--/api/v2/push/send", {
           to: tokenDoc.token,
           sound: "default",
-          title,
+          title: `Hiii ${tokenDoc.name}`,
           body,
         })
       )
