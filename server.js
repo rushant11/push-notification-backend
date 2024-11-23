@@ -19,35 +19,37 @@ app.get("/", (req, res) => {
 
 // Route to save token (already exists)
 app.post("/save-token", async (req, res) => {
-  const { token } = req.body;
-  if (!token) return res.status(400).send("Token is required");
+  try {
+    const { token } = req.body;
+    if (!token) return res.status(400).json({ error: "Token is required" });
 
-  const existingToken = await Token.findOne({ token });
-  if (existingToken) {
-    return res.status(200).send("Token already exists");
+    const existingToken = await Token.findOne({ token });
+    if (existingToken) {
+      return res.status(200).json({ message: "Token already exists" });
+    }
+
+    const newToken = new Token({ token });
+    await newToken.save();
+    res.status(201).json({ message: "Token saved successfully" });
+  } catch (error) {
+    console.error("Error saving token:", error);
+    res.status(500).json({ error: "Internal Server Error" });
   }
-
-  const newToken = new Token({ token });
-  await newToken.save();
-  res.status(201).send("Token saved");
 });
 
 // Route to send notification to all users
 app.post("/api/send-notification", async (req, res) => {
-  const { title, body } = req.body;
-
-  if (!title || !body) {
-    return res.status(400).json({ error: "Title and body are required" });
-  }
-
-  // Fetch all tokens from the database
-  const tokens = await Token.find();
-
-  if (!tokens.length) {
-    return res.status(404).json({ error: "No tokens found" });
-  }
-
   try {
+    const { title, body } = req.body;
+    if (!title || !body) {
+      return res.status(400).json({ error: "Title and body are required" });
+    }
+
+    const tokens = await Token.find();
+    if (!tokens.length) {
+      return res.status(404).json({ error: "No tokens found" });
+    }
+
     const responses = await Promise.all(
       tokens.map((tokenDoc) =>
         axios.post("https://exp.host/--/api/v2/push/send", {
@@ -58,10 +60,13 @@ app.post("/api/send-notification", async (req, res) => {
         })
       )
     );
-    res.status(200).json({ message: "Notifications sent", responses });
+
+    res
+      .status(200)
+      .json({ message: "Notifications sent successfully", responses });
   } catch (error) {
     console.error("Error sending notifications:", error);
-    // res.status(500).json({ error: "Failed to send notification" });
+    res.status(500).json({ error: "Failed to send notifications" });
   }
 });
 
